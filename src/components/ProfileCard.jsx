@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
-import axios from "../api/axiosInstance";
+import axiosInstance from "../api/axiosInstance";
 
 const ProfileCard = () => {
   const { user, token } = useAuth();
@@ -13,32 +13,32 @@ const ProfileCard = () => {
   });
 
   // ✅ Fetch user info
+  // ✅ Fetch user info and order stats
   useEffect(() => {
-    // console.log("Profile User:", user)
     const fetchUserInfo = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/users/${user.userId}`, {
+        const res = await axiosInstance.get(`/users/${user.userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await res.json();
-        // console.log("My data", data)
-        if (!res.ok) throw new Error(data.message);
-        setUserInfo(data.user);
+
+        setUserInfo(res.data.user);
       } catch (err) {
-        toast.error("Failed to fetch user info");
+        const errMsg = err.response?.data?.message || "Failed to fetch user info";
+        toast.error(errMsg);
       }
     };
 
     const fetchOrderStats = async () => {
       try {
-        const res = await axios.get(
-          `/orders/history/${user.userId}?page=1&limit=1000`, // ✅ Increased limit
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await axiosInstance.get(`/orders/history/${user.userId}`, {
+          params: {
+            page: 1,
+            limit: 1000,
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
     
         const orders = res.data.orders || [];
     
@@ -55,7 +55,10 @@ const ProfileCard = () => {
           lastOrderDate: lastOrder,
         });
       } catch (err) {
-        toast.error("Failed to fetch order stats");
+        // Only toast if it's not a 404 (maybe user has 0 orders)
+        if (err.response?.status !== 404) {
+          toast.error("Failed to fetch order stats");
+        }
       }
     };
 

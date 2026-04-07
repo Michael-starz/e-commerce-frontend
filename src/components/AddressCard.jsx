@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import axiosInstance from "../api/axiosInstance";
 
 const AddressCard = () => {
   const { user, token } = useAuth();
@@ -22,25 +23,30 @@ const AddressCard = () => {
   useEffect(() => {
     const fetchAddress = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/users/${user.userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const data = await res.json();
+        const res = await axiosInstance.get(`/users/${user.userId}`, {
+      headers: { 
+        Authorization: `Bearer ${token}` 
+      },
+    });
+        const data = res.data;
         if (!res.ok) throw new Error(data.message || "Could not fetch address");
 
-        setAddressInfo({
-          address: data.user.address || "",
-          postCode: data.user.postCode || "",
-          email: data.user.email || "",
-          phone: data.user.phone || "", // ✅ Corrected: was data.phone
-        });
+        if (data?.user) {
+      setAddressInfo({
+        address: data.user.address || "",
+        postCode: data.user.postCode || "",
+        email: data.user.email || "",
+        phone: data.user.phone || "",
+      });
 
-        setNewAddress(data.user.address || "");
-        setNewPostCode(data.user.postCode || "");
-        setNewPhone(data.user.phone || "");
+      setNewAddress(data.user.address || "");
+      setNewPostCode(data.user.postCode || "");
+      setNewPhone(data.user.phone || "");
+    }
       } catch (err) {
-        toast.error("Failed to load address info");
+        const errorMsg = err.response?.data?.message || "Failed to load address info";
+        toast.error(errorMsg);
+        console.error("Fetch Address Error:", err);
       }
     };
 
@@ -50,45 +56,48 @@ const AddressCard = () => {
   // ✅ Validate phone format
   const isValidPhone = (phone) => {
     const regex = /^\+?\d{7,15}$/;
-    return !phone || regex.test(phone); // valid or empty (optional)
+    return !phone || regex.test(phone); // valid or empty
   };
 
   // ✅ Handle update
   const handleUpdate = async () => {
-    if (!isValidPhone(newPhone)) {
-      toast.error("Please enter a valid phone number.");
-      return;
-    }
+  if (!isValidPhone(newPhone)) {
+    toast.error("Please enter a valid phone number.");
+    return;
+  }
 
-    const payload = {};
-    if (newAddress) payload.address = newAddress;
-    if (newPostCode) payload.postCode = newPostCode;
-    if (newPhone) payload.phone = newPhone;
+  // Create the object with updated fields
+  const payload = {};
+  if (newAddress) payload.address = newAddress;
+  if (newPostCode) payload.postCode = newPostCode;
+  if (newPhone) payload.phone = newPhone;
 
-    try {
-      const res = await fetch(`http://localhost:5000/api/users/${user.userId}/update-details`, {
-        method: "PUT",
+  try {
+    const res = await axiosInstance.put(
+      `/users/${user.userId}/update-details`,
+      {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload),
-      });
+      }
+    );
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to update");
+    const data = res.data;
 
-      setAddressInfo((prev) => ({
-        ...prev,
-        ...payload, // only updated fields
-      }));
+    setAddressInfo((prev) => ({
+      ...prev,
+      ...payload, 
+    }));
 
-      setShowModal(false);
-      toast.success("Details updated successfully!");
-    } catch (err) {
-      toast.error(err.message || "Error updating details");
-    }
-  };
+    setShowModal(false);
+    toast.success(data.message || "Details updated successfully!");
+    
+  } catch (err) {
+    const errorMessage = err.response?.data?.message || "Error updating details";
+    toast.error(errorMessage);
+    console.error("Update Details Error:", err);
+  }
+};
 
   return (
     <>

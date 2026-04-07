@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Dropdown, Modal, Button } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
+import axiosInstance from "../api/axiosInstance";
 
 const OrdersTable = () => {
   const { user, token } = useAuth();
@@ -22,16 +23,19 @@ const OrdersTable = () => {
   useEffect(() => {
     const fetchUserOrders = async () => {
       try {
-        const res = await fetch(
-          `http://localhost:5000/api/orders/history/${user.userId}?page=${page}&limit=5`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        setLoading(true);
 
-        const data = await res.json();
+        const res = await axiosInstance.get(`/orders/history/${user.userId}`, {
+        params: {
+          page: page,
+          limit: 5,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+        const data = res.data;
         if (!res.ok) throw new Error(data.message || "Failed to fetch orders");
 
         const formatted = data.orders.map((order) => ({
@@ -54,7 +58,9 @@ const OrdersTable = () => {
         setOrders(formatted);
         setTotalPages(data.totalPages || 1);
       } catch (err) {
-        toast.error(err.message);
+        const errorMsg = err.response?.data?.message || "Failed to fetch orders";
+      toast.error(errorMsg);
+      console.error("Orders Table Error:", err);
       } finally {
         setLoading(false);
       }

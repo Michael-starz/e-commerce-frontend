@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import axiosInstance from "../api/axiosInstance";
 
 const ProfileHeader = () => {
   const { user, token } = useAuth();
@@ -34,28 +35,30 @@ const ProfileHeader = () => {
     setLoading(true);
 
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/users/change-password/${user.userId}`,
+      const res = await axiosInstance.patch(
+        `/users/change-password/${user.userId}`,
+        { 
+          currentPassword, 
+          newPassword 
+        },
         {
-          method: "PATCH",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ currentPassword, newPassword }),
         }
       );
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to update password");
+      // const data = await res.json();
+      // if (!res.ok) throw new Error(data.message || "Failed to update password");
 
-      toast.success("Password updated successfully!");
+      toast.success(res.data.message || "Password updated successfully!");
       setShowModal(false);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
-      toast.error(err.message || "Error updating password.");
+      const errorMessage = err.response?.data?.message || "Error updating password.";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
