@@ -38,7 +38,7 @@ const OrdersTable = () => {
         const data = res.data;
         const ordersToFormat = data.orders || [];
 
-        const formatted = ordersToFormat.orders.map((order) => ({
+        const formatted = ordersToFormat.map((order) => ({
           id: `#${order.orderId.slice(-6)}`,
           status: order.status,
           statusClass: getStatusClass(order.status),
