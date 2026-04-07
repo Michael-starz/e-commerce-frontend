@@ -71,6 +71,8 @@ const AddressCard = () => {
   if (newPostCode) payload.postCode = newPostCode;
   if (newPhone) payload.phone = newPhone;
 
+  console.log("Token being sent:", token);
+
   try {
     const res = await axiosInstance.put(
       `/users/${user.userId}/update-details`,
