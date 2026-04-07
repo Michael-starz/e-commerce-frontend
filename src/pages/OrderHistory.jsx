@@ -3,9 +3,9 @@ import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import Footer from "../components/Footer";
 import MenuSection from "../components/MenuSection";
-// import Navbar from "../components/Navbar";
 import OrderFilters from "../components/OrderFilters";
 import OrderPagination from "../components/OrderPagination";
+import axiosInstance from "../api/axiosInstance";
 
 const OrderHistory = () => {
   const { user, token } = useAuth();
@@ -20,16 +20,17 @@ const OrderHistory = () => {
   const fetchOrders = async (page = 1, filter = "All") => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `http://localhost:5000/api/orders/history/${user.userId}?page=${page}&limit=${limit}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await axiosInstance.get(`/orders/history/${user.userId}`, {
+      params: { 
+        page, 
+        limit 
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      });
 
-      const data = await res.json();
+      const data = res.data;
       if (!res.ok) throw new Error(data.message || "Could not fetch orders");
 
       // Filter locally by status
@@ -38,11 +39,13 @@ const OrderHistory = () => {
           ? data.orders
           : data.orders.filter((order) => order.status === filter);
 
-      setOrders(filteredOrders);
-      setTotalPages(data.totalPages);
-      setCurrentPage(data.currentPage);
+      setOrders(filteredOrders || []);
+      setTotalPages(data.totalPages || 1);
+      setCurrentPage(data.currentPage || 1);
     } catch (err) {
-      toast.error(err.message || "Failed to load order history");
+      const errorMessage = err.response?.data?.message || "Failed to load order history";
+      toast.error(errorMessage);
+      console.error("Order Fetch Error:", err);
     } finally {
       setLoading(false);
     }
