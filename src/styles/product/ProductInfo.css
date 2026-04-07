@@ -1,0 +1,9 @@
+/* ProductInfo.css */
+.product-info {
+    padding: 0 1rem;
+  }
+  
+  .product-title {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }

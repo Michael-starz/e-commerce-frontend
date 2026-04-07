@@ -1,0 +1,30 @@
+/* styles/ui/PriceDisplay.css */
+.price-display {
+    font-family: Arial, sans-serif;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  
+  .price-display.small {
+    font-size: 14px;
+  }
+  
+  .price-display.medium {
+    font-size: 16px;
+  }
+  
+  .price-display.large {
+    font-size: 18px;
+  }
+  
+  .current-price {
+    font-weight: bold;
+    color: #2ecc71; /* Green for discounted price */
+  }
+  
+  .original-price {
+    text-decoration: line-through;
+    color: #95a5a6; /* Gray for original price */
+    font-size: 0.9em;
+  }

@@ -1,0 +1,104 @@
+/* styles/product/ProductSpecs.css */
+.product-specs {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: var(--light-bg, #f8f9fa);
+    border-radius: var(--border-radius, 8px);
+    border: 1px solid var(--border-color, #e9ecef);
+  }
+  
+  .product-specs h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1.25rem;
+    color: var(--heading-color, #212529);
+    font-weight: 600;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-accent, #dee2e6);
+  }
+  
+  .product-specs ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+  
+  .product-specs li {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px dashed var(--border-light, #eee);
+  }
+  
+  .product-specs li:last-child {
+    border-bottom: none;
+  }
+  
+  .product-specs strong {
+    color: var(--text-primary, #495057);
+    font-weight: 500;
+  }
+  
+  .product-specs li > :not(strong) {
+    color: var(--text-secondary, #6c757d);
+    word-break: break-word;
+  }
+
+  /* === Color Variations === */
+  /* Technical Products */
+  .tech-specs {
+    --specs-accent: var(--primary-color);
+    --specs-bg: var(--primary-light);
+  }
+  
+  /* Fashion Products */
+  .fashion-specs {
+    --specs-accent: #e83e8c;
+    --specs-bg: #fff0f6;
+  }
+  
+  /* Home Goods */
+  .home-specs {
+    --specs-accent: #20c997;
+    --specs-bg: #e6fcf5;
+  }
+  
+  /* === Compact View === */
+  .compact-view {
+    --font-size-base: 0.875rem;
+    --border-radius: 3px;
+    --spacer: 0.75rem;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .product-specs {
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+  
+    .product-specs li {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+  }
+  
+  /* Animation */
+  @keyframes specFadeIn {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .product-specs li {
+    animation: specFadeIn 0.3s ease-out forwards;
+    animation-delay: calc(var(--index) * 0.05s);
+    opacity: 0;
+  }

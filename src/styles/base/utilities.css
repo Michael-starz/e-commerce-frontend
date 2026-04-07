@@ -1,0 +1,12 @@
+/* utilities.css */
+/* .loading-spinner { */
+    /* loading spinner styles */
+  /* } */
+  
+  .error-message {
+    color: var(--danger-color);
+  }
+  
+  .not-found {
+    color: var(--secondary-color);
+  }

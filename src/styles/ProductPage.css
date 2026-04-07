@@ -1,0 +1,22 @@
+@import './base/variables.css';
+@import './base/buttons.css';
+@import './base/utilities.css';
+
+.product-page {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.product-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+@media (max-width: 768px) {
+  .product-container {
+    grid-template-columns: 1fr;
+  }
+}
