@@ -2,6 +2,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../api/axiosInstance";
 
 
 const UserForm = ({ showForm, setShowForm }) => {
@@ -52,18 +53,12 @@ const UserForm = ({ showForm, setShowForm }) => {
       ? { email, password }
       : { name, email, password };
 
-    const endpoint = isLogin
-      ? "http://localhost:5000/api/users/login"
-      : "http://localhost:5000/api/users/register";
+    const path = isLogin ? "/users/login" : "/users/register";
 
     try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await axiosInstance.post(path, payload);
 
-      const data = await res.json();
+      const data = res.data;
 
       if (!res.ok) throw new Error(data.message || "Something went wrong");
 
@@ -75,7 +70,8 @@ const UserForm = ({ showForm, setShowForm }) => {
 
       setShowForm(false);
     } catch (err) {
-      toast.error(err.message || "Something went wrong");
+      const errorMessage = err.response?.data?.message || "Something went wrong";
+      toast.error(errorMessage);
     }
   };
 
