@@ -29,7 +29,6 @@ const AddressCard = () => {
       },
     });
         const data = res.data;
-        if (!res.ok) throw new Error(data.message || "Could not fetch address");
 
         if (data?.user) {
       setAddressInfo({

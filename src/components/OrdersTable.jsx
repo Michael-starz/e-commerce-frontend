@@ -36,9 +36,9 @@ const OrdersTable = () => {
       });
 
         const data = res.data;
-        if (!res.ok) throw new Error(data.message || "Failed to fetch orders");
+        const ordersToFormat = data.orders || [];
 
-        const formatted = data.orders.map((order) => ({
+        const formatted = ordersToFormat.orders.map((order) => ({
           id: `#${order.orderId.slice(-6)}`,
           status: order.status,
           statusClass: getStatusClass(order.status),
