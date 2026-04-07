@@ -46,34 +46,67 @@ const UserForm = ({ showForm, setShowForm }) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+  e.preventDefault();
+  if (!validateForm()) return;
 
-    const payload = isLogin
-      ? { email, password }
-      : { name, email, password };
+  const payload = isLogin
+    ? { email, password }
+    : { name, email, password };
 
-    const path = isLogin ? "/users/login" : "/users/register";
+  const path = isLogin ? "/users/login" : "/users/register";
 
-    try {
-      const res = await axiosInstance.post(path, payload);
+  try {
+    const res = await axiosInstance.post(path, payload);
 
-      const data = res.data;
+    const serverResponse = res.data; 
 
-      if (!res.ok) throw new Error(data.message || "Something went wrong");
+    toast.success(serverResponse.message || "Success!");
 
-      toast.success(data.message || "Success!");
-
-      // ✅ NEW: Save to auth context
-      authLogin(data.user, data.token); // stores user and token globally
-      navigate("/")
-
+    if (serverResponse.user && serverResponse.token) {
+      authLogin(serverResponse.user, serverResponse.token);
+      navigate("/");
       setShowForm(false);
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || "Something went wrong";
-      toast.error(errorMessage);
+    } else {
+      console.error("Backend sent success but missing user/token:", serverResponse);
+      toast.error("Login successful, but profile data missing.");
     }
-  };
+
+  } catch (err) {
+    const errorMessage = err.response?.data?.message || "Something went wrong";
+    console.log("Full Error Object:", err);
+    toast.error(errorMessage);
+  }
+};
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!validateForm()) return;
+
+  //   const payload = isLogin
+  //     ? { email, password }
+  //     : { name, email, password };
+
+  //   const path = isLogin ? "/users/login" : "/users/register";
+
+  //   try {
+  //     const res = await axiosInstance.post(path, payload);
+
+  //     const data = res.data;
+
+  //     if (!res.ok) throw new Error(data.message || "Something went wrong");
+
+  //     toast.success(data.message || "Success!");
+
+  //     // ✅ NEW: Save to auth context
+  //     authLogin(data.user, data.token); // stores user and token globally
+  //     navigate("/")
+
+  //     setShowForm(false);
+  //   } catch (err) {
+  //     const errorMessage = err.response?.data?.message || "Something went wrong";
+  //     toast.error(errorMessage);
+  //   }
+  // };
 
   return (
     <div className={`user-form ${showForm ? "show" : ""}`}>
