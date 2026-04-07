@@ -31,17 +31,20 @@ const OrderHistory = () => {
       });
 
       const data = res.data;
-      if (!res.ok) throw new Error(data.message || "Could not fetch orders");
+      if (data && data.orders) {
+    const filteredOrders =
+      filter === "All"
+        ? data.orders
+        : data.orders.filter((order) => order.status === filter);
 
-      // Filter locally by status
-      const filteredOrders =
-        filter === "All"
-          ? data.orders
-          : data.orders.filter((order) => order.status === filter);
+    setOrders(filteredOrders);
+    setTotalPages(data.totalPages || 1);
+    setCurrentPage(data.currentPage || 1);
+  } else {
+    // If the data is empty but the request was "successful"
+    setOrders([]);
+  }
 
-      setOrders(filteredOrders || []);
-      setTotalPages(data.totalPages || 1);
-      setCurrentPage(data.currentPage || 1);
     } catch (err) {
       const errorMessage = err.response?.data?.message || "Failed to load order history";
       toast.error(errorMessage);
